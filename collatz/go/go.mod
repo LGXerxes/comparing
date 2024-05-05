@@ -1,0 +1,1 @@
+module collatz_go
