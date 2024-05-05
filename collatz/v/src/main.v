@@ -62,9 +62,8 @@ fn setup(max u64, num_threads u8) (chan Message, []thread) {
 fn logger(channel chan Message, file_logger bool) chan u32 {
 	total_chan := chan u32{}
 
-	go fn [channel, total_chan, file_logger] () {
-		// cannot create a none of an option type? (needs to go through function?)
-		mut file := os.File{}
+	spawn fn [channel, total_chan, file_logger] () {
+		mut file := ?os.File(none)
 		mut buff := []u8{}
 
 		if file_logger {
@@ -78,18 +77,19 @@ fn logger(channel chan Message, file_logger bool) chan u32 {
 			seq := <-channel or { break }
 			total += seq.seqlen
 
-			if file_logger {
+			if mut f := file {
 				buff << '${seq.number}:${seq.seqlen}'.bytes()
 
 				if buff.len >= 50000 {
-					file.write(buff) or { panic('what') }
+					f.write(buff) or { panic('what') }
 					buff.clear()
 				}
 			}
 		}
-		if file_logger {
+
+		if mut f := file {
 			if buff.len >= 0 {
-				file.write(buff) or { panic('what') }
+				f.write(buff) or { panic('what') }
 			}
 		}
 

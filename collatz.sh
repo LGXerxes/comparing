@@ -20,6 +20,7 @@ mv -f target/release/collatz_rust ../../bins
 cd ../v
 echo "building v"
 v . -prod -o collatz_v
+# v . -prod -gc none -o collatz_v
 rm -f ../../bins/collatz_v
 mv -f collatz_v ../../bins
 
